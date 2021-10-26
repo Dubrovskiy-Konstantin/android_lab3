@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 
 class PageAudioFragment : PageFragment() {
     public override var mode: String = "audio"
+    lateinit var textView: TextView
     private var pageNumber = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,14 +18,11 @@ class PageAudioFragment : PageFragment() {
         pageNumber = if (arguments != null) requireArguments().getInt("num") else 1
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val result: View = inflater.inflate(R.layout.audio_fragment_page, container, false)
-        val pageHeader = result.findViewById<TextView>(R.id.displayAudio)
-        val header = "Аудио фрагмент " + (pageNumber + 1)
-        pageHeader.text = header
+        textView = result.findViewById<TextView>(R.id.displayAudio)
+        val header = "Аудио фрагмент " + (pageNumber)
+        textView.text = header
         return result
     }
 
@@ -36,5 +34,9 @@ class PageAudioFragment : PageFragment() {
             fragment.arguments = args
             return fragment
         }
+    }
+
+    fun setText(string: String){
+        this.textView.text = string
     }
 }

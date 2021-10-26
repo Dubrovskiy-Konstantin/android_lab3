@@ -7,42 +7,90 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.VideoView
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener
 import androidx.viewpager2.widget.ViewPager2
 import android.widget.*
+import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 
+
+var PACKAGE_NAME : String = ""
 
 class MainActivity : AppCompatActivity() {
     private val _requestcode = 1
-    var pages = ArrayList<PageFragment>()
+    //var pages = ArrayList<PageFragment>()
     lateinit var chooseAudioButton : Button
     lateinit var chooseVideoButton: Button
     lateinit var viewPager: ViewPager2
+    lateinit var videoView: VideoView
+    lateinit var mediaPlayer: MediaPlayer
+    lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        PACKAGE_NAME = packageName
+
         viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        viewPager.adapter = FragmentAdapter(this)
         chooseAudioButton = findViewById<Button>(R.id.buttonChooseAudio)
         chooseVideoButton = findViewById<Button>(R.id.buttonChooseVideo)
+        mediaPlayer = MediaPlayer()
+
+        textView = findViewById(R.id.textView)
+
+        viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                //textView.text = "Начинаем двигать ${position.toString()}"
+                //Toast.makeText(this@MainActivity, "Начинаем двигать ${position.toString()}", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                textView.text = "Выбрана позиция ${position.toString()}"
+//                if(mediaPlayer.isPlaying) mediaPlayer.stop()
+//                mediaPlayer = MediaPlayer.create(this@MainActivity, R.raw.test_music)
+//                mediaPlayer.setOnCompletionListener(OnCompletionListener { mediaPlayer.stop() })
+//                mediaPlayer.start()
+                //Toast.makeText(this@MainActivity, "Выбрана позиция ${position.toString()}", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                //textView.text = "Скрол стэйт ${state.toString()}"
+                //Toast.makeText(this@MainActivity, "Скрол ст ${state.toString()}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
     }
 
-    fun updatePages(){
-        val position = viewPager.currentItem
-        val pageAdapter: FragmentStateAdapter = FragmentAdapter(this, pages)
-        viewPager.adapter = pageAdapter
-        viewPager.setCurrentItem(position, false)
-    }
+//    fun updatePages(){
+//        val position = viewPager.currentItem
+//        val pageAdapter: FragmentStateAdapter = FragmentAdapter(this, pages)
+//        viewPager.adapter = pageAdapter
+//        viewPager.setCurrentItem(position, false)
+//        val x = viewPager.adapter as FragmentAdapter
+//        x.add(PageAudioFragment())
+//    }
 
     fun chooseAudio(view: View){
-        pages.add(PageAudioFragment())
-        updatePages()
+        val adapter = viewPager.adapter as FragmentAdapter
+        adapter.addItem(PageAudioFragment())
+        //(adapter.getItemAt(viewPager.currentItem) as PageAudioFragment).setText("asdasdas")
+        //pages.add(PageAudioFragment())
+        //updatePages()
     }
 
     fun chooseVideo(view: View){
-        pages.add(PageVideoFragment())
-        updatePages()
+        val adapter = viewPager.adapter as FragmentAdapter
+        adapter.addItem(PageVideoFragment())
+        //pages.add(PageVideoFragment())
+        //updatePages()
+        //var a = viewPager[viewPager.currentItem]
+        //var frag = fragmentManager.findFragmentById(R.id.vide)
     }
 
 
