@@ -1,42 +1,61 @@
 package com.example.mediaplayer
 
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.MediaController
 import android.widget.TextView
+import android.widget.VideoView
 import androidx.fragment.app.Fragment
+import java.io.FileNotFoundException
+import java.io.Serializable
 
 
-class PageAudioFragment : PageFragment() {
+class PageAudioFragment(file: String) : PageFragment(file) {
     public override var mode: String = "audio"
     lateinit var textView: TextView
-    private var pageNumber = 0
+    lateinit var audioPlayer : VideoView
+    var test = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageNumber = if (arguments != null) requireArguments().getInt("num") else 1
+        //file = if (arguments != null) requireArguments().getString("file")!! else throw FileNotFoundException()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val result: View = inflater.inflate(R.layout.audio_fragment_page, container, false)
         textView = result.findViewById<TextView>(R.id.displayAudio)
-        val header = "Аудио фрагмент " + (pageNumber)
-        textView.text = header
+
+
         return result
     }
 
     companion object {
-        fun newInstance(page: Int): PageAudioFragment {
-            val fragment = PageAudioFragment()
-            val args = Bundle()
-            args.putInt("num", page)
-            fragment.arguments = args
+        fun newInstance(fragment: PageAudioFragment): PageAudioFragment {
+//            val args = Bundle()
+//            args.putString("file", fragment.file)
+//            fragment.arguments = args
             return fragment
         }
     }
 
-    fun setText(string: String){
-        this.textView.text = string
+    override fun onStart() {
+        super.onStart()
+        val myAudioUri = Uri.parse(file)
+        audioPlayer.setVideoURI(myAudioUri)
+        val mediaController = MediaController(context)
+        audioPlayer.setMediaController(mediaController)
+        mediaController.setMediaPlayer(audioPlayer)
+
+        textView.text = "START"
+    }
+
+    override fun onResume() {
+        super.onResume()
+        audioPlayer.start()
+        textView.text = "RESUME"
     }
 }

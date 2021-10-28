@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int ) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                //textView.text = "Начинаем двигать ${position.toString()}"
+                //textView.text = "Начинаем двигать ${position}|$positionOffset|$positionOffsetPixels"
                 //Toast.makeText(this@MainActivity, "Начинаем двигать ${position.toString()}", Toast.LENGTH_SHORT).show()
             }
 
@@ -67,6 +67,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    public fun nextPage(view: View){
+
+    }
+
+    public fun prevPage(view: View){
+
+    }
+
 //    fun updatePages(){
 //        val position = viewPager.currentItem
 //        val pageAdapter: FragmentStateAdapter = FragmentAdapter(this, pages)
@@ -78,7 +86,8 @@ class MainActivity : AppCompatActivity() {
 
     fun chooseAudio(view: View){
         val adapter = viewPager.adapter as FragmentAdapter
-        adapter.addItem(PageAudioFragment())
+        var file = "android.resource://" + packageName + "/" + R.raw.test_music
+        adapter.addItem(PageAudioFragment(file))
         //(adapter.getItemAt(viewPager.currentItem) as PageAudioFragment).setText("asdasdas")
         //pages.add(PageAudioFragment())
         //updatePages()
@@ -86,7 +95,10 @@ class MainActivity : AppCompatActivity() {
 
     fun chooseVideo(view: View){
         val adapter = viewPager.adapter as FragmentAdapter
-        adapter.addItem(PageVideoFragment())
+        var file = "android.resource://" + packageName + "/" + R.raw.test_video
+        adapter.addItem(PageVideoFragment(file, this))
+        //adapter.addItem(PageVideoFragment("android.resource://" + packageName + "/" + R.raw.test_music))
+
         //pages.add(PageVideoFragment())
         //updatePages()
         //var a = viewPager[viewPager.currentItem]

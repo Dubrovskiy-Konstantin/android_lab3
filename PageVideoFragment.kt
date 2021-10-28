@@ -1,5 +1,9 @@
 package com.example.mediaplayer
 
+import android.content.Context
+import android.media.MediaParser
+import android.media.MediaPlayer
+import android.media.MediaPlayer.OnPreparedListener
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,40 +13,100 @@ import android.widget.VideoView
 
 import androidx.fragment.app.Fragment
 import android.net.Uri
+import android.os.Build
+import android.util.Log
 import android.widget.MediaController
+import java.io.FileNotFoundException
+import android.app.Activity
+import android.content.Intent
+import android.view.KeyEvent
+import androidx.appcompat.app.AppCompatActivity
 
 
-class PageVideoFragment : PageFragment() {
-    private var pageNumber = 0
-
+class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
+    val requestCode = 1
     override var mode: String = "video"
+    lateinit var videoPlayer : VideoView
+    var currentPosition : Int = 0
+    var startPosition : Long = 0
+    lateinit var textView : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageNumber = if (arguments != null) requireArguments().getInt("num") else 1
+        file = if (arguments != null) requireArguments().getString("file")!! else throw FileNotFoundException()
+        if(savedInstanceState != null){
+            this.file = savedInstanceState.getString("file") as String
+            this.currentPosition = savedInstanceState.getInt("currentPosition")
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val result: View = inflater.inflate(R.layout.video_fragment_page, container, false)
-        val pageHeader = result.findViewById<TextView>(R.id.displayVideo)
-        val header = "Видео фрагмент " + (pageNumber)
-        pageHeader.text = header
-
-        var videoPlayer = result.findViewById<VideoView>(R.id.videoPlayer)
-        val myVideoUri = Uri.parse("android.resource://" + com.example.mediaplayer.PACKAGE_NAME + "/" + R.raw.test_video)
-        videoPlayer.setVideoURI(myVideoUri)
-        videoPlayer.start()
-
+        textView = result.findViewById<TextView>(R.id.displayVideo)
+        textView.text = file
+        videoPlayer = result.findViewById<VideoView>(R.id.videoPlayer)
         return result
     }
 
     companion object {
-        fun newInstance(page: Int): PageVideoFragment {
-            val fragment = PageVideoFragment()
+        fun newInstance(fragment: PageVideoFragment): PageVideoFragment {
             val args = Bundle()
-            args.putInt("num", page)
+            args.putString("file", fragment.file)
             fragment.arguments = args
             return fragment
         }
+    }
+
+    private fun fullScreenMode(){
+        var intent = Intent(context, FullScreenActivity::class.java)
+        intent.putExtra("file", file)
+        intent.putExtra("currentPosition", videoPlayer.currentPosition)
+        startActivityForResult(intent, requestCode)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(data == null)
+            return
+        this.currentPosition = data.getIntExtra("currentPosition", 0)
+        videoPlayer.seekTo(currentPosition)
+        videoPlayer.start()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("currentPosition", currentPosition)
+        outState.putString("file", file)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val myVideoUri = Uri.parse(file)
+        videoPlayer.setVideoURI(myVideoUri)
+        val mediaController = CustomMediaController(context)
+        mediaController.setListener {
+            fullScreenMode()
+        }
+        videoPlayer.setMediaController(mediaController)
+        mediaController.setMediaPlayer(videoPlayer)
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        videoPlayer.stopPlayback()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        videoPlayer.seekTo(currentPosition)
+        videoPlayer.start()
+        startPosition = System.currentTimeMillis()
+    }
+
+    override fun onPause() {
+        videoPlayer.pause()
+        currentPosition += (System.currentTimeMillis() - startPosition).toInt()
+        super.onPause()
     }
 }

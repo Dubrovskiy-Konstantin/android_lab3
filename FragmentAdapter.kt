@@ -12,9 +12,9 @@ class FragmentAdapter(fragmentActivity: FragmentActivity?) : FragmentStateAdapte
 
     override fun createFragment(position: Int): Fragment {
         if(pages[position].mode == "audio")
-            return PageAudioFragment.newInstance(position)
+            return PageAudioFragment.newInstance(pages[position] as PageAudioFragment)
         else if (pages[position].mode == "video")
-            return PageVideoFragment.newInstance(position)
+            return PageVideoFragment.newInstance(pages[position] as PageVideoFragment)
         else
             throw Exception("!mode")
     }
