@@ -3,25 +3,16 @@ package com.example.mediaplayer;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.MediaController;
-
-import androidx.annotation.RequiresApi;
-
 import java.lang.reflect.Field;
 
-/**
- * Custom MediaController that fixes issue with controls appearing offset on pre 4.3 devices
- * and shows how to add additional functionality such as fullscreen button
- */
+
 public class CustomMediaController extends MediaController {
 
     public static interface OnMediaControllerInteractionListener {
@@ -66,7 +57,6 @@ public class CustomMediaController extends MediaController {
     @Override
     public void show(int timeout) {
         super.show(timeout);
-        // fix pre Android 4.3 strange positioning when used in Fragments
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion < Build.VERSION_CODES.JELLY_BEAN_MR2) {
             try {
@@ -86,12 +76,9 @@ public class CustomMediaController extends MediaController {
                 field4.setAccessible(true);
                 WindowManager mWindowManager = (WindowManager)field4.get(this);
 
-                // NOTE: this appears in its own Window so co-ordinates are screen co-ordinates
                 int [] anchorPos = new int[2];
                 mAnchor.getLocationOnScreen(anchorPos);
 
-                // we need to know the size of the controller so we can properly position it
-                // within its space
                 mDecor.measure(MeasureSpec.makeMeasureSpec(mAnchor.getWidth(), MeasureSpec.AT_MOST),
                         MeasureSpec.makeMeasureSpec(mAnchor.getHeight(), MeasureSpec.AT_MOST));
 
@@ -102,7 +89,7 @@ public class CustomMediaController extends MediaController {
                 p.horizontalMargin = 0;
                 p.width = mAnchor.getWidth();
                 p.gravity = Gravity.LEFT|Gravity.TOP;
-                p.x = anchorPos[0];// + (mAnchor.getWidth() - p.width) / 2;
+                p.x = anchorPos[0];
                 p.y = anchorPos[1] + mAnchor.getHeight() - mDecor.getMeasuredHeight();
                 mWindowManager.updateViewLayout(mDecor, mDecorLayoutParams);
 

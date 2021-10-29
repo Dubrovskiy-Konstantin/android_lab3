@@ -1,9 +1,6 @@
 package com.example.mediaplayer
 
 import android.content.Context
-import android.media.MediaParser
-import android.media.MediaPlayer
-import android.media.MediaPlayer.OnPreparedListener
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +8,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.VideoView
 
-import androidx.fragment.app.Fragment
 import android.net.Uri
-import android.os.Build
-import android.util.Log
-import android.widget.MediaController
 import java.io.FileNotFoundException
-import android.app.Activity
 import android.content.Intent
-import android.view.KeyEvent
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
+import java.lang.Exception
 
 
 class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
@@ -30,6 +22,7 @@ class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
     var currentPosition : Int = 0
     var startPosition : Long = 0
     lateinit var textView : TextView
+    private var canNowPlayMusic : Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +36,12 @@ class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val result: View = inflater.inflate(R.layout.video_fragment_page, container, false)
         textView = result.findViewById<TextView>(R.id.displayVideo)
-        textView.text = file
+        var name : String? = null
+        try{
+            name = getFileNameFromURI(Uri.parse(file))
+        }
+        catch (e:Exception){}
+        textView.text = name ?: file
         videoPlayer = result.findViewById<VideoView>(R.id.videoPlayer)
         return result
     }
@@ -83,7 +81,8 @@ class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
         super.onStart()
         val myVideoUri = Uri.parse(file)
         videoPlayer.setVideoURI(myVideoUri)
-        val mediaController = CustomMediaController(context)
+        val mediaController =
+            CustomMediaController(requireContext())
         mediaController.setListener {
             fullScreenMode()
         }
@@ -99,6 +98,12 @@ class PageVideoFragment(file: String, context : Context) : PageFragment(file) {
 
     override fun onResume() {
         super.onResume()
+        if(canNowPlayMusic){
+            context?.stopService(Intent(context, MediaService::class.java))
+            NotificationManagerCompat.from(requireContext()).cancel(NotificationHandler.NOTIFICATION_ID)
+        }
+        context?.stopService(Intent(context, MediaService::class.java))
+        NotificationManagerCompat.from(requireContext()).cancel(NotificationHandler.NOTIFICATION_ID)
         videoPlayer.seekTo(currentPosition)
         videoPlayer.start()
         startPosition = System.currentTimeMillis()

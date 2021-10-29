@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.WindowManager
-import android.widget.MediaController
 import android.widget.VideoView
 import java.lang.NullPointerException
 
@@ -26,7 +25,8 @@ class FullScreenActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_full_screen)
         videoView = findViewById(R.id.fullScreenVideoView)
-        var mediaController = CustomMediaController(this)
+        var mediaController =
+            CustomMediaController(this)
         mediaController.setListener {
             back()
         }
