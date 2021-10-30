@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.core.app.NotificationManagerCompat
 import java.io.FileNotFoundException
@@ -111,15 +112,21 @@ class PageAudioFragment(file: String, context: Context) : PageFragment(file), Vi
             R.id.buttonAdd -> {
                 if(!isPlaying)
                     return
+                currentPosition += (System.currentTimeMillis() - startPosition).toInt()
                 currentPosition += 10000
+                startPosition = System.currentTimeMillis()
+                Toast.makeText(context?.applicationContext, "+10", Toast.LENGTH_SHORT).show()
                 context?.stopService(intent)
             }
             R.id.buttonSub -> {
                 if(!isPlaying)
                     return
+                currentPosition += (System.currentTimeMillis() - startPosition).toInt()
                 currentPosition -= 10000
+                startPosition = System.currentTimeMillis()
                 if(currentPosition < 0)
                     currentPosition = 0
+                Toast.makeText(context?.applicationContext, "-10", Toast.LENGTH_SHORT).show()
                 context?.stopService(intent)
             }
         }

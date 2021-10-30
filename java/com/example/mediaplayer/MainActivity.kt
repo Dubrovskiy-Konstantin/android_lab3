@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.media.MediaPlayer;
+import android.util.Log
 import androidx.viewpager2.widget.ViewPager2
 import android.widget.*
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -61,7 +62,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestcode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestcode, resultCode, data)
-        val path: String = data?.data?.path ?: return
+        val path: String = data?.data?.toString() ?: return
+        Log.d("FFFFFFFpath", path)
+        Log.d("Uripath", data.data.toString())
         val adapter = viewPager.adapter as FragmentAdapter
         if(resultCode != RESULT_OK)
             return

@@ -8,5 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="light_blue">#bfd8ff</color>
-    <color name="blue">#a6bce0</color>
+    <color name="meant">#ad9ad5c2</color>
+    <color name="pistachio">#aed3e48e</color>
 </resources>

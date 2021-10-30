@@ -23,6 +23,8 @@ class MediaService : Service() {
         if(file.isNullOrEmpty())
             throw FileNotFoundException()
         ambientMediaPlayer = MediaPlayer.create(this, Uri.parse(file))
+        if(ambientMediaPlayer == null)
+            throw Exception("mediaplayer is null")
         ambientMediaPlayer!!.isLooping = true
         if(currentPosition < ambientMediaPlayer!!.duration && currentPosition > 0)
             ambientMediaPlayer!!.seekTo(currentPosition)
